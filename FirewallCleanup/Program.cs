@@ -10,6 +10,7 @@ namespace FirewallCleanup
     {
         static void Main(string[] args)
         {
+            FWIfz fwi = new FWIfz();
         }
     }
 }
