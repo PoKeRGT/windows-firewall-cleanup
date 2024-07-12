@@ -1,0 +1,38 @@
+name: .NET Framework Build on Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild path
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages
+        run: msbuild /t:restore
+
+      - name: Build project
+        run: msbuild /p:Configuration=Release /p:TargetFrameworkVersion=v4.8 /p:RestorePackagesConfig=true
+
+      - name: Set ENV date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d%H%M%S')"
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            **/bin/Release/**
+          token: ${{ github.token }}
+          tag_name: ${{ steps.date.outputs.date }}
